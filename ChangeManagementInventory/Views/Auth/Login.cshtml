@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="mx-auto" style="width: 200px;padding-top: 20px;">
+
+    <div class="card" style="width: 20rem; box-shadow: 5px 5px rgba(0, 0, 0, 0.5)">
+        <div class="card-body">
+            <h5 class="card-title">Login</h5>
+            <form>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" id="username" />
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" />
+                </div>
+            </form>
+
+
+            <a href="/Applications/Index" class="btn btn-primary">Login</a>
+        </div>
+    </div>
+</div>
+
