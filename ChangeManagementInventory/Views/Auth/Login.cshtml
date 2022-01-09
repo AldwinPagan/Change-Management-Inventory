@@ -1,27 +1,37 @@
-﻿
+﻿@model ChangeManagementInventory.ViewModels.LoginViewModel
+
 @{
     ViewBag.Title = "Login";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
 }
+@User.Identity.Name
 
 <div class="mx-auto" style="width: 200px;padding-top: 20px;">
 
     <div class="card" style="width: 20rem; box-shadow: 5px 5px rgba(0, 0, 0, 0.5)">
         <div class="card-body">
             <h5 class="card-title">Login</h5>
-            <form>
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @Html.ValidationSummary()
+                </div>
+
+            }
+            <form method="post">
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" class="form-control" id="username" />
+                    @Html.TextBoxFor(x => x.Username, htmlAttributes: new { @class = "form-control", @id = "username" })
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" />
+                    @Html.PasswordFor(x => x.Password, htmlAttributes: new { @class = "form-control", @id = "password" })
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" id="login">Login</button>
                 </div>
             </form>
-
-
-            <a href="/Applications/Index" class="btn btn-primary">Login</a>
         </div>
     </div>
 </div>

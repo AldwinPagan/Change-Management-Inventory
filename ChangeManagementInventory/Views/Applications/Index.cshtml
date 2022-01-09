@@ -1,42 +1,39 @@
-﻿
+﻿@model  ChangeManagementInventory.ViewModels.ApplicationsViewModel
+@Html.Hidden("PageNumber", Model.Applications.PageNumber)
 @{
     ViewBag.Title = "Applications";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<script src="~/Scripts/App/Applications.js"></script>
 
 <a type="button" class="btn btn-primary" href="/Applications/Application" id="add" style="margin-top:20px;">Add</a>
-
 <hr />
 
-<form>
+<form action="" method="get">
+    @Html.Hidden("page", Model.Applications.PageNumber)
+    @Html.Hidden("pageSize", Model.Applications.PageSize)
     <div class="row">
 
         <div class="col">
             <div class="form-group">
                 <label for="applicationName">Application Name</label>
-                <input type="text" class="form-control" id="applicationName">
+                <input type="text" class="form-control" id="applicationName" name="ApplicationName" value="@Model.ApplicationName">
             </div>
 
             <div class="form-group">
                 <label for="supplier">Supplier</label>
-                <input type="email" class="form-control" id="supplier">
+                <input type="text" class="form-control" id="supplier" name="SupplierName" value="@Model.SupplierName">
             </div>
 
         </div>
 
         <div class="col">
 
+            <label for="appType">Application Type</label>
+            @Html.DropDownListFor(m => m.SelectedAppTypeId, Model.AppTypes, htmlAttributes: new { @class = "custom-select form-control", @id = "appType" })
 
             <div class="form-group">
-                <label for="applicationName">Application Name</label>
-                <select class="custom-select" id="applicationType">
-                    @*options goes here*@
-                    <option value="1">One</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <button type="button" class="btn btn-primary" id="applyFilter" style="margin-top: 5rem;">Apply Filter</button>
+                <button type="submit" class="btn btn-primary" id="applyFilter" style="margin-top: 5rem;">Apply Filter</button>
             </div>
         </div>
 
@@ -56,70 +53,77 @@
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td scope="row">Application A (AA)</td>
-            <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </td>
-            <td>Web</td>
-            <td>CFSE</td>
-        </tr>
-        <tr>
-            <td>Application B (AB)</td>
-            <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </td>
-            <td>iSeries</td>
-            <td>Vendor A</td>
-        </tr>
-        <tr>
-            <td>Application C (AC)</td>
-            <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </td>
-            <td>Web</td>
-            <td>CFSE</td>
-        </tr>
+        @foreach (var application in Model.Applications)
+        {
+
+            <tr>
+                <td scope="row"> @Html.ActionLink(@application.Name, "Application", new { id = application.Id.ToString() })</td>
+                <td>@application.Description</td>
+                <td>@application.AppType.Description</td>
+                <td>@application.Supplier.Name</td>
+            </tr>
+
+        }
     </tbody>
 </table>
 
-<div class="row">
+<div class="d-flex justify-content-between">
 
-    <div class="col-4">
+    <div class="row">
 
         <div class="input-group input-group-sm mb-3">
-            <select class="custom-select-md" id="itemsPerPage">
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
+            @Html.DropDownList("pageSize", new SelectListItem[] {
+                new SelectListItem() { Text = "--- Select Page Size ---", Value = "1", Selected=  @Model.Applications.PageSize == 1 },
+                new SelectListItem() { Text = "2", Value = "2", Selected = @Model.Applications.PageSize == 2},
+                new SelectListItem() { Text = "5", Value = "5", Selected = @Model.Applications.PageSize == 5},
+            }, new { @onchange = "submitItemsPerPageSelection()", @class = "custom-select-md"})
             <div class="input-group-append">
                 <span class="input-group-text">Per Page</span>
             </div>
         </div>
     </div>
 
-    <div class="col-6">
+    <div class="row">
 
         <nav aria-label="Page navigation example">
             <ul class="pagination">
-                <li class="page-item"><a class="page-link" href="#">First</a></li>
-                <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                <li class="page-item"><a class="page-link" href="#">Last</a></li>
+                @if (!Model.Applications.IsFirstPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="@Url.Action("Index", new { page = "1", pageSize = Model.Applications.PageSize })">First</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="@Url.Action("Index", new { page = Model.Applications.PageNumber - 1, pageSize = Model.Applications.PageSize })">Previous</a>
+                    </li>
+                }
+                @for (int i = 1; i <= Model.Applications.PageCount; i++)
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="@Url.Action("Index", new { page = i.ToString(), pageSize = Model.Applications.PageSize })">@i.ToString()</a>
+                    </li>
+                }
+                @if (!Model.Applications.IsLastPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="@Url.Action("Index", new { page = Model.Applications.PageNumber + 1, pageSize = Model.Applications.PageSize })">Next</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="@Url.Action("Index", new { page = Model.Applications.PageCount, pageSize = Model.Applications.PageSize })">Last</a>
+                    </li>
+                }
+
             </ul>
         </nav>
     </div>
 
 
-    <div class="col">
-
-        <div class="input-group input-group-sm">
-            <div class="input-group-prepend">
-                <span class="input-group-text" id="inputGroup-sizing-sm">Page</span>
-            </div>
-            <input type="text" class="form-control form-control-sm" id="page">
-            <div class="input-group-append">
-                <span class="input-group-text" id="totalPages">of 9</span>
-            </div>
-        </div>
+    <div class="row">
+        Showing @Model.Applications.FirstItemOnPage to @Model.Applications.LastItemOnPage of @Model.Applications.TotalItemCount Products
     </div>
 
 

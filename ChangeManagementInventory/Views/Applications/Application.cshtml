@@ -1,170 +1,248 @@
-﻿
+﻿@model ChangeManagementInventory.ViewModels.ApplicationViewModel
+@Html.ValidationSummary(excludePropertyErrors: true)
+
 @{
     ViewBag.Title = "Application";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var expirationDate = @Model.Application.AppSupportTime.ToString("yyyy-MM-dd") != "0001-01-01" ? @Model.Application.AppSupportTime.ToString("yyyy-MM-dd") : "";
 }
+<script src="~/Scripts/App/Applications.js"></script>
 
+@using (Html.BeginForm(actionName: "Application", controllerName: "Applications", method: FormMethod.Post, htmlAttributes: new { enctype = "multipart/form-data", @class = "needs-validation" }))
+{
+    <div class="row" style="margin-top: 20px;">
 
-<div class="row" style="margin-top: 20px;">
-
-    <div class="col-8">
-        <h2>Application Maintenance</h2>
-    </div>
-
-    <div class="col">
-        <button type="button" class="btn btn-danger" style="margin-right: 20px;">Delete</button>
-        <button type="button" class="btn btn-light" style="margin-right: 20px;">Save</button>
-        <a type="button" class="btn btn-light" href="/Applications/Index">Close</a>
-    </div>
-
-</div>
-
-<hr />
-
-<div class="row">
-
-
-    <div class="col-6">
-        <div class="form-group">
-            <label for="applicationName">Application Name</label>
-            <input type="text" class="form-control" id="applicationName">
+        <div class="col-8">
+            <h2>Application Maintenance</h2>
         </div>
 
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea class="form-control" id="description"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="abbreviation">Abbreviation</label>
-            <input type="text" class="form-control" id="abbreviation">
-        </div>
-
-        <div class="form-group">
-            <label for="userManual">User Manual</label>
-            <div class="input-group">
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="userManual">
-                    <label class="custom-file-label">Choose file</label>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label for="operationsManual">Operations Manual</label>
-            <div class="input-group">
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="operationsManual">
-                    <label class="custom-file-label">Choose file</label>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label for="databaseManual">Database Manual</label>
-            <div class="input-group">
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="databaseManual">
-                    <label class="custom-file-label">Choose file</label>
-                </div>
-            </div>
+        <div class="col">
+            @if (Model.Application.Id != Guid.Empty)
+            {
+                <button type="button" class="btn btn-danger" style="margin-right: 20px;" data-toggle="modal" data-target="#confirmDeleteModal">Delete</button>
+            }
+            <input type="submit" formmethod="post" class="btn btn-light" value="Save" style="margin-right: 20px;" />
+            <a type="button" class="btn btn-light" href="/Applications/Index">Close</a>
         </div>
 
     </div>
 
-    <div class="col">
+    <hr />
 
-        <div class="form-group">
-            <label for="version">Version</label>
-            <input type="text" class="form-control" id="version">
-        </div>
+    <div class="row">
 
-        <div class="form-group">
-            <label for="appType">Application Type</label>
-            <select class="custom-select" id="appType">
-                @*options goes here*@
-                <option value="1">One</option>
-            </select>
-        </div>
 
-        <div class="form-group">
-            <label for="supplier">Supplier</label>
-            <select class="custom-select" id="supplier">
-                @*options goes here*@
-                <option value="1">One</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="manufacturer">Manufacturer</label>
-            <select class="custom-select" id="manufacturer">
-                @*options goes here*@
-                <option value="1">One</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="licenseType">License Type</label>
-            <select class="custom-select" id="licenseType">
-                @*options goes here*@
-                <option value="1">One</option>
-            </select>
-        </div>
-
-        <hr />
-
-        <div class="row">
-
-            <div class="col">
-
-                <div class="form-group">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="isActive">
-                        <label class="form-check-label" for="isActive">Active (In Use)</label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="useProcesses">
-                        <label class="form-check-label" for="useProcesses">Use Processes</label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="haveSupport">
-                        <label class="form-check-label" for="haveSupport">Have Support</label>
-                    </div>
-                </div>
-
+        <div class="col-6">
+            <div class="form-group">
+                <label class="form-label" for="applicationName">Application Name</label>
+                <input type="text" class="form-control" id="applicationName" name="Name" value="@Model.Application.Name">
+                <small class="text-danger">
+                    @Html.ValidationMessageFor(x => x.Name)
+                </small>
             </div>
 
-            <div class="col">
-
-                <div class="form-group">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="highlyAvailable">
-                        <label class="form-check-label" for="highlyAvailable">Highly Available</label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="adAuthentication">
-                        <label class="form-check-label" for="adAuthentication">AD Authentication</label>
-                    </div>
-                </div>
-
-
-                <div class="form-group">
-                    <label for="expiration">Expiration</label>
-                    <input type="text" class="form-control" id="expiration" placeholder="YYYY-MM-DD">
-                </div>
-
-
+            <div class="form-group">
+                <label class="form-label" for="description">Description</label>
+                @Html.TextArea("Description", Model.Application.Description, new { @class = "form-control", @style = "min-width: 100%; min-height:10rem" })
+                <small class="text-danger">
+                    @Html.ValidationMessageFor(x => x.Description)
+                </small>
             </div>
+
+            <div class="form-group">
+                <label class="form-label" for="abbreviation">Abbreviation</label>
+                <input type="text" class="form-control" id="abbreviation" name="Abbreviation" value="@Model.Application.Abbreviation">
+                <small class="text-danger">
+                    @Html.ValidationMessageFor(x => x.Abbreviation)
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="userManual">User Manual</label>
+                <div class="input-group">
+
+                    @if (String.IsNullOrEmpty(Model.Application.UserManualPath))
+                    {
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="userManual" name="UserManualFile">
+                            <label class="custom-file-label" for="userManual">Choose file</label>
+                        </div>
+                    }
+                    else
+                    {
+                        <a id="userManual" href="@Model.Application.UserManualPath">@Model.UserManualFileName</a>
+                    }
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="operationsManual">Operations Manual</label>
+                <div class="input-group">
+
+                    @if (String.IsNullOrEmpty(Model.Application.OpsManualPath))
+                    {
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="opsManualPath" name="OpsManualFile">
+                            <label class="custom-file-label" for="opsManualPath" onchange="changeLabel()">Choose file</label>
+                        </div>
+                    }
+                    else
+                    {
+                        <a id="operationsManual" href="@Model.Application.OpsManualPath">@Model.OpsManualFileName</a>
+                    }
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="databaseManual">Database Manual</label>
+                <div class="input-group">
+                    @if (String.IsNullOrEmpty(Model.Application.DBManualPath))
+                    {
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="DBManualPath" name="DBManualFile">
+                            <label class="custom-file-label" for="DBManualPath">Choose file</label>
+                        </div>
+                    }
+                    else
+                    {
+                        <a id="databaseManual" href="@Model.Application.DBManualPath">@Model.DBManualFileName</a>
+                    }
+
+                </div>
+            </div>
+
         </div>
 
+        <div class="col">
+
+            <div class="form-group">
+                <label class="form-label" for="version">Version</label>
+                <input type="text" class="form-control " id="version" name="Version" value="@Model.Application.Version">
+                <small class="text-danger">
+                    @Html.ValidationMessageFor(x => x.Version)
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="appType">Application Type</label>
+                @Html.DropDownListFor(m => m.SelectedAppTypeId, Model.AppTypes, htmlAttributes: new { @class = "form-control", @id = "appType" })
+                <small class="text-danger">
+                    @Html.ValidationMessageFor(x => x.SelectedAppTypeId)
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="appType">Supplier</label>
+                @Html.DropDownListFor(m => m.SelectedSupplierId, Model.Suppliers, htmlAttributes: new { @class = "form-control", @id = "supplier" })
+                <small class="text-danger">
+                    @Html.ValidationMessageFor(x => x.SelectedSupplierId)
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="appType">Manufacturer</label>
+                @Html.DropDownListFor(m => m.SelectedManufacturerId, Model.Manufacturers, htmlAttributes: new { @class = "form-control", @id = "manufacturer" })
+                <div class="text-danger">
+                    @Html.ValidationMessageFor(x => x.SelectedManufacturerId)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="appType">License Type</label>
+                @Html.DropDownListFor(m => m.SelectedAppLicenseTypeId, Model.AppLicenseTypes, htmlAttributes: new { @class = "form-control", @id = "appLicenseType" })
+                <small class="text-danger">
+                    @Html.ValidationMessageFor(x => x.SelectedAppLicenseTypeId)
+                </small>
+            </div>
+
+            <hr />
+
+            <div class="row">
+
+                <div class="col">
+
+                    <div class="form-group">
+                        <div class="form-check">
+                            @Html.CheckBox("IsActive", Model.Application.IsActive.HasValue ? Model.Application.IsActive.Value : false, new { @class = "form-check-input", @id = "isActive" })
+                            <label class="form-check-label" for="isActive">Active (In Use)</label>
+                            <small class="text-danger">
+                                @Html.ValidationMessageFor(x => x.IsActive)
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-check">
+                            @Html.CheckBox("UseProcesses", Model.Application.UseProcesses.HasValue ? Model.Application.UseProcesses.Value : false, new { @class = "form-check-input", @id = "useProcesses" })
+                            <label class="form-check-label" for="useProcesses">Use Processes</label>
+                            <small class="text-danger">
+                                @Html.ValidationMessageFor(x => x.UseProcesses)
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-check">
+                            @Html.CheckBox("Support", Model.Application.Support.HasValue ? Model.Application.Support.Value : false, new { @class = "form-check-input", @id = "haveSupport" })
+                            <label class="form-check-label" for="haveSupport">Have Support</label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col">
+
+                    <div class="form-group">
+                        <div class="form-check">
+                            @Html.CheckBox("HighAvailable", Model.Application.HighAvailable.HasValue ? Model.Application.HighAvailable.Value : false, new { @class = "form-check-input", @id = "highlyAvailable" })
+                            <label class="form-check-label" for="highlyAvailable">Highly Available</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-check">
+                            @Html.CheckBox("NeedADAuthentication", Model.Application.NeedADAuthentication.HasValue ? Model.Application.NeedADAuthentication.Value : false, new { @class = "form-check-input", @id = "adAuthentication" })
+                            <label class="form-check-label" for="adAuthentication">AD Authentication</label>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="form-label" for="expiration">Expiration</label>
+                        <input type="date" class="form-control" id="expiration" name="AppSupportTime" placeholder="MM/DD/YYYY" value="@expirationDate">
+                        <small class="text-danger">
+                            @Html.ValidationMessageFor(x => x.AppSupportTime)
+                        </small>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
     </div>
-</div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Delete Application</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete @Model.Application.Name?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteApplication('@Model.Application.Id.ToString()')">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
